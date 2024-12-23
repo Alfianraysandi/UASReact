@@ -1,210 +1,361 @@
-// import { Text, View, StyleSheet, ScrollView, TouchableOpacity, ToastAndroid } from "react-native";
-// import Octicons from '@expo/vector-icons/Octicons';
-// import AntDesign from '@expo/vector-icons/AntDesign';
-// import { ButtonTemplate, FormTemplate } from "@/components";
-// import { router } from 'expo-router';
-// import CApi from '../lib/ApiManager';
-// import { useSelector, useDispatch } from 'react-redux';
-// import { setData, resetData } from '../store/reducer/loginReducer';
-// import React from "react";
+import { Text, View, StyleSheet, ScrollView, TouchableOpacity, Image, TextInput, Linking, ToastAndroid } from "react-native";
+import Octicons from '@expo/vector-icons/Octicons';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import { ButtonTemplate, FormTemplate, AlternateLogin } from "@/components";
+import { router } from 'expo-router';
+import CApi from '../lib/CApi';
+import { useSelector, useDispatch } from 'react-redux';
+import { setData, resetData } from '../store/reducer/loginReducer';
+import React from "react";
+import Fontisto from '@expo/vector-icons/Fontisto';
 
-// export default function Register() {
-//     const registerForm = useSelector((state) => state.login.loginInput);
-//     const dispatch = useDispatch();
+export default function Register() {
 
-//     const onChangeValue = (payload: any) => {
-//         dispatch(setData({ ...registerForm, ...payload }));
-//     };
+    const registerForm = useSelector((state) => state.login.loginInput);
+    const dispatch = useDispatch();
 
-//     const onSaveData = async () => {
-//         try {
-//             // Validasi tambahan
-//             if (registerForm.password !== registerForm.confirm_password) {
-//                 ToastAndroid.show("Passwords do not match!", ToastAndroid.SHORT);
-//                 return;
-//             }
+    const onChangeValue = (payload: any) => {
+        dispatch(setData({ ...registerForm, ...payload }));
+    };
 
-//             if (registerForm._id === '') {
-//                 const { data } = await CApi.post('/register', registerForm);
-//                 ToastAndroid.show(data.message, ToastAndroid.SHORT);
-//             }
+    const onSaveData = async () => {
+        try {
+            if (!registerForm.email || !registerForm.name || !registerForm.password) {
+                ToastAndroid.show("Data tidak boleh kosong", ToastAndroid.SHORT);
+                return;
+            }
 
-//             dispatch(resetData());
-//         } catch (error: any) {
-//             const msg = error?.response?.data?.message || error?.message || 'Something went wrong';
-//             ToastAndroid.show(msg, ToastAndroid.SHORT);
-//         }
-//     };
+            const { data } = await CApi.post('/register', registerForm, {
+                headers: { 'Content-Type': 'text/plain' }
+            });
 
-//     const routeBack = () => {
-//         router.push('/login');
-//     };
+            ToastAndroid.show("Register Success", ToastAndroid.SHORT);
 
-//     // Validasi password
-//     const isPasswordValid = registerForm.password?.length >= 8;
-//     const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(registerForm.password);
+            dispatch(resetData());
+            router.push('/login')
+        } catch (error: any) {
+            const msg = error?.response?.data?.message || error?.message || 'Something went wrong';
+            ToastAndroid.show(msg, ToastAndroid.SHORT);
+        }
+    };
+    const [email, setEmail] = React.useState('');
+    const [name, setName] = React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [isPasswordVisible, setIsPasswordVisible] = React.useState(false); // Control visibility of password
 
-//     return (
-//         <ScrollView style={style.scroll}>
-//             <View style={style.section}>
-//                 <View style={style.navbar}>
-//                     <TouchableOpacity onPress={routeBack} style={style.backButton}>
-//                         <Octicons name="chevron-left" size={24} color="black" />
-//                     </TouchableOpacity>
-//                     <Text style={[style.navPlaceholder, style.fontFamily]}>Register Account</Text>
-//                 </View>
+    // Kondisi validasi password
+    const isPasswordValid = password.length >= 8;
+    const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
-//                 <View style={style.container}>
-//                     <View style={style.shape}>
-//                         <AntDesign name="lock1" size={24} color="#5E62DB" />
-//                     </View>
-//                     <Text style={[style.title, style.fontFamily]}>Create New Account</Text>
-//                     <Text style={[style.subtitle, style.fontFamily]}>
-//                         Your new password must be different from previously used passwords.
-//                     </Text>
-//                 </View>
+    // // Arahkan kembali ke halaman sebelumnya (misalnya halaman login) setelah pengguna mendaftar
+    // const handleSignUp = () => {
+    //     // Logika pendaftaran (contohnya, validasi email, password, dll.)
+    //     // Setelah proses selesai, arahkan kembali ke halaman sebelumnya:
+    //     router.back(); // Back to previous page after signing up
+    // };
+    const [toggle, SetToggle] = React.useState(false);
+    const toggleActive = () => {
+        SetToggle(!toggle);
+    }
 
-//                 <FormTemplate
-//                     style={{ borderRadius: 10 }}
-//                     label="Name"
-//                     placeholder="Enter Your Name"
-//                     onChangeText={(val: any) => onChangeValue({ name: val })}
-//                     value={registerForm.name}
-//                 />
+    const github = () => {
+        Linking.openURL('/');
+    }
+    const gitlab = () => {
+        Linking.openURL('/');
+    }
 
-//                 <FormTemplate
-//                     style={{ borderRadius: 10 }}
-//                     label="Email"
-//                     placeholder="Enter Your Email"
-//                     onChangeText={(val: any) => onChangeValue({ email: val })}
-//                     value={registerForm.email}
-//                 />
 
-//                 <FormTemplate
-//                     style={{ borderRadius: 10 }}
-//                     label="New Password*"
-//                     placeholder="Enter Your New Password"
-//                     onChangeText={(val: any) => onChangeValue({ password: val })}
-//                     value={registerForm.password}
-//                     max={8}
-//                     secure={true}
-//                 />
+    return (
+        <ScrollView style={style.scroll}>
+            <View style={style.section}>
 
-//                 <FormTemplate
-//                     style={{ borderRadius: 10 }}
-//                     label="Confirm Password*"
-//                     placeholder="Confirm password"
-//                     onChangeText={(val: any) => onChangeValue({ confirm_password: val })}
-//                     value={registerForm.confirm_password}
-//                     max={8}
-//                     secure={true}
-//                 />
+                <View style={style.container}>
+                    {/* Ganti icon dengan gambar kustom */}
+                    {/* <View style={style.shape}>
+                        <Image
+                            source={require('./assets/images/logo.png')}  // Ganti dengan jalur gambar kustom Anda
+                            style={style.image}
+                            resizeMode="contain"
+                        />
+                    </View> */}
 
-//                 {/* Validasi Password */}
-//                 <View style={style.check}>
-//                     <AntDesign
-//                         name={isPasswordValid ? "checkcircle" : "closecircle"}
-//                         size={13}
-//                         color={isPasswordValid ? "#5E62DB" : "red"}
-//                     />
-//                     <Text style={style.checkStatus}>Must be at least 8 characters</Text>
-//                 </View>
+                    {/* Memindahkan teks ke sebelah kiri */}
+                    <View style={style.textContainer}>
+                        <Text style={[style.title, style.fontFamily]}>Create An Account</Text>
+                        <Text style={[style.subtitle, style.fontFamily, { marginBottom: 20 }]}>Connect with your friends today!.</Text>
+                    </View>
+                </View>
 
-//                 <View style={style.check}>
-//                     <AntDesign
-//                         name={hasSpecialCharacter ? "checkcircle" : "closecircle"}
-//                         size={13}
-//                         color={hasSpecialCharacter ? "#5E62DB" : "red"}
-//                     />
-//                     <Text style={style.checkStatus}>Must contain one special character</Text>
-//                 </View>
+                {/* Name Number Input */}
+                <FormTemplate
+                    style={style.phone}
+                    label='Your Name'
+                    placeholder='Enter Your Name'
+                    change={(val: any) => onChangeValue({ name: val })}
+                    value={registerForm.name}
+                />
 
-//                 <ButtonTemplate
-//                     style={style.button}
-//                     title="Submit"
-//                     onPress={onSaveData}
-//                 />
-//             </View>
-//         </ScrollView>
-//     );
-// }
+                {/* Email Address Input */}
+                <FormTemplate
+                    style={{ borderRadius: 10, }}
+                    label='Email Address'
+                    placeholder='Enter Your Email Address'
+                    change={(val: any) => onChangeValue({ email: val })}
+                    value={registerForm.email}
+                />
 
-// const style = StyleSheet.create({
-//     fontFamily: {
-//         fontFamily: 'sans-serif',
-//     },
+                {/* Label for Password */}
+                <Text style={style.label}>Password</Text>
 
-//     scroll: {
-//         backgroundColor: "#FFFFFF",
-//     },
+                {/* Password Input with Eye Icon */}
+                <View style={style.passwordContainer}>
+                    <TextInput
+                        style={style.input}
+                        placeholder='Enter Your Password'
+                        secureTextEntry={!isPasswordVisible} // Toggling password visibility
+                        onChangeText={(val: any) => onChangeValue({ password: val })}
+                        value={registerForm.password}
+                    />
+                    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+                        <AntDesign
+                            name={isPasswordVisible ? "eye" : "eyeo"}
+                            size={20}
+                            color="grey"
+                            style={style.eyeIcon}
+                        />
+                    </TouchableOpacity>
+                </View>
 
-//     section: {
-//         flex: 1,
-//         padding: 20,
-//         backgroundColor: "#FFFFFF",
-//     },
+                {/* Remember Me dan Forgot Password */}
+                <View style={style.options}>
+                    <View style={style.rememberMeContainer}>
+                        <TouchableOpacity onPress={toggleActive}>
+                            <Fontisto name={toggle ? 'checkbox-active' : 'checkbox-passive'} size={18} color="black" />
+                        </TouchableOpacity>
+                        <Text style={style.rememberMeText}>Remember Me</Text>
+                    </View>
 
-//     backButton: {
-//         left: -100,
-//     },
+                    <TouchableOpacity onPress={() => router.push('/')}>
+                        <Text style={style.forgotPassword}>Forgot Password?</Text>
+                    </TouchableOpacity>
+                </View>
 
-//     navbar: {
-//         display: 'flex',
-//         flexDirection: 'row',
-//         padding: 30,
-//         justifyContent: 'center',
-//     },
+                {/* Button Sign Up */}
+                <ButtonTemplate
+                    style={style.button}
+                    title='Sign Up'
+                    onPress={onSaveData} // Panggil handleSignUp ketika tombol diklik
+                />
 
-//     navPlaceholder: {
-//         fontSize: 14,
-//         color: '#1E2842',
-//         fontWeight: '500',
-//     },
+                {/* Line separator */}
+                <View style={[style.lineContainer, { marginVertical: 30 }]}>
+                    <View style={style.hairline} />
+                    <Text style={style.orText}>Or With</Text>
+                    <View style={style.hairline} />
+                </View>
 
-//     container: {
-//         alignItems: 'center',
-//     },
+                {/* Github and Gitlab login options */}
+                <View style={style.loginOptionsContainer}>
+                    <AlternateLogin title="Continue with Github"
+                        onPress={github}
+                        logo='github'
+                        style={style.loginButton}
+                    />
+                    <AlternateLogin title="Continue with Gitlab"
+                        onPress={gitlab}
+                        logo='gitlab'
+                        color='orange'
+                        style={style.loginButton}
+                    />
+                </View>
 
-//     shape: {
-//         width: 52,
-//         height: 50,
-//         backgroundColor: '#EFEFFB',
-//         justifyContent: 'center',
-//         alignItems: 'center',
-//         borderRadius: 10,
-//     },
+                {/* Add a link back to login with accompanying text */}
+                <View style={style.loginContainer}>
+                    <Text style={style.alreadyHaveAccount}>Already have an account? </Text>
+                    <TouchableOpacity onPress={() => router.push('/login')}>
+                        <Text style={style.loginLink}>Login</Text>
+                    </TouchableOpacity>
+                </View>
 
-//     title: {
-//         fontSize: 20,
-//         color: '#505050',
-//         fontWeight: '600',
-//         marginTop: 24,
-//     },
+            </View>
+        </ScrollView>
+    );
+}
 
-//     subtitle: {
-//         color: '#505050',
-//         fontSize: 14,
-//         width: '70%',
-//         textAlign: 'center',
-//         marginTop: 6,
-//     },
+const style = StyleSheet.create({
+    fontFamily: {
+        fontFamily: 'sans-serif',
+    },
 
-//     check: {
-//         display: 'flex',
-//         flexDirection: 'row',
-//         alignItems: 'center',
-//         marginBottom: 12,
-//     },
+    scroll: {
+        backgroundColor: "#FFFFFF",
+    },
 
-//     checkStatus: {
-//         marginLeft: 10,
-//         fontSize: 12,
-//         color: '#242424',
-//     },
+    section: {
+        flex: 1,
+        padding: 20,
+        paddingTop: 80,
+        backgroundColor: "#FFFFFF",
+    },
 
-//     button: {
-//         padding: 15,
-//         borderRadius: 23,
-//         marginTop: 12,
-//     },
-// });
+    backButton: {
+        left: -100,
+    },
+
+    container: {
+        alignItems: 'center',
+    },
+
+    shape: {
+        width: 100,
+        height: 100,
+        backgroundColor: '#EFEFFB',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+    },
+
+    image: {
+        width: 80,
+        height: 80,
+    },
+
+    textContainer: {
+        width: '100%',
+        alignItems: 'flex-start',
+        marginTop: 24,
+    },
+
+    title: {
+        fontSize: 20,
+        color: '#505050',
+        fontWeight: '600',
+    },
+
+    subtitle: {
+        color: '#505050',
+        fontSize: 14,
+        textAlign: 'left',
+        marginTop: 6,
+    },
+
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 10,
+        paddingHorizontal: 10,
+        marginVertical: 10,
+    },
+
+    input: {
+        flex: 1,
+        height: 40,
+    },
+
+    phone: {
+        borderRadius: 10,
+
+    },
+
+    eyeIcon: {
+        paddingLeft: 10,
+    },
+
+    check: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+
+    checkStatus: {
+        marginLeft: 10,
+        fontSize: 12,
+        color: '#242424',
+    },
+
+    label: {
+        color: '#4B5368',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+
+    options: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginVertical: 20,
+    },
+
+    rememberMeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+
+    rememberMeText: {
+        marginLeft: 10,
+        fontSize: 14,
+    },
+
+    forgotPassword: {
+        color: '#5E62DB',
+        fontSize: 14,
+    },
+
+    button: {
+        padding: 15,
+        borderRadius: 23,
+        marginTop: 12,
+    },
+
+    lineContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+
+    hairline: {
+        borderColor: '#B9BCC4',
+        width: 153,
+        borderTopWidth: 1,
+    },
+
+    orText: {
+        fontSize: 14,
+        color: '#4B5368',
+    },
+
+    loginOptionsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        paddingHorizontal: 20,
+        marginTop: 20,
+    },
+
+    loginButton: {
+        width: '45%',
+        marginHorizontal: 10,
+    },
+
+    loginContainer: {
+        flexDirection: 'row',  // Align text and link horizontally
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,  // Space from the previous section
+    },
+
+    alreadyHaveAccount: {
+        fontSize: 14,
+        color: '#505050',  // Optional: change color if needed
+    },
+
+    loginLink: {
+        color: '#5E62DB',  // Color of the link
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+});

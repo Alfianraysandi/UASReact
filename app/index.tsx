@@ -8,14 +8,14 @@ export default function Index() {
   }
   return (
     <View style={style.section}>
-      <Image
+      {/* <Image
         style={style.welcomeImg}
-        source={require('./assets/images/welcome-img.png')}
-      />
+        source={require('./assets/images/logo.png')}
+      /> */}
 
-      <Text style={[style.welcomeText, style.welcomeTextAll]}>Welcome to our app</Text>
+      <Text style={[style.welcomeText, style.welcomeTextAll]}></Text>
       <View style={style.container}>
-        <Text style={[style.welcomeTextSub, style.welcomeTextAll]}>Now you can fund your account so you’re ready to invest in crypto</Text>
+        <Text style={[style.welcomeTextSub, style.welcomeTextAll]}></Text>
         <ButtonTemplate
           title="Let's Go"
           onPress={routeToLogin}
@@ -58,8 +58,8 @@ const style = StyleSheet.create({
   },
 
   welcomeImg: {
-    width: 300,
-    height: 300,
+    width: 214,
+    height: 211,
   },
 
   button: {

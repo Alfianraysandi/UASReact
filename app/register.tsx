@@ -11,7 +11,7 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 
 export default function Register() {
 
-    const registerForm = useSelector((state) => state.login.loginInput);
+    const registerForm = useSelector((state : any) => state.login.loginInput);
     const dispatch = useDispatch();
 
     const onChangeValue = (payload: any) => {
@@ -21,7 +21,7 @@ export default function Register() {
     const onSaveData = async () => {
         try {
             if (!registerForm.email || !registerForm.name || !registerForm.password) {
-                ToastAndroid.show("Data tidak boleh kosong", ToastAndroid.SHORT);
+                //ToastAndroid.show("Data tidak boleh kosong", ToastAndroid.SHORT);
                 return;
             }
 
@@ -29,13 +29,13 @@ export default function Register() {
                 headers: { 'Content-Type': 'text/plain' }
             });
 
-            ToastAndroid.show("Register Success", ToastAndroid.SHORT);
-
+            //ToastAndroid.show("Register Success", ToastAndroid.SHORT);
+            console.log('success',data)
             dispatch(resetData());
             router.push('/login')
         } catch (error: any) {
             const msg = error?.response?.data?.message || error?.message || 'Something went wrong';
-            ToastAndroid.show(msg, ToastAndroid.SHORT);
+            //ToastAndroid.show(msg, ToastAndroid.SHORT);
         }
     };
     const [email, setEmail] = React.useState('');
@@ -126,6 +126,27 @@ export default function Register() {
                         />
                     </TouchableOpacity>
                 </View>
+
+                <Text style={style.label}> Confirm Password</Text>
+
+{/* Password Input with Eye Icon */}
+<View style={style.passwordContainer}>
+    <TextInput
+        style={style.input}
+        placeholder='Confirm Your Password'
+        secureTextEntry={!isPasswordVisible} // Toggling password visibility
+        onChangeText={(val: any) => onChangeValue({ confirm_password: val })}
+        value={registerForm.confirm_password}
+    />
+    <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+        <AntDesign
+            name={isPasswordVisible ? "eye" : "eyeo"}
+            size={20}
+            color="grey"
+            style={style.eyeIcon}
+        />
+    </TouchableOpacity>
+</View>
 
                 {/* Remember Me dan Forgot Password */}
                 <View style={style.options}>

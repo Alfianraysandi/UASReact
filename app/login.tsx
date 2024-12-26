@@ -44,7 +44,7 @@ export default function Login() {
                 password: password,
             };
 
-            const { data } = await CApi.post('/login', request, {
+            const { data } = await CApi.post('/auth/login', request, {
                 headers: { 'Content-Type': 'text/plain' }
             });
 
@@ -56,7 +56,7 @@ export default function Login() {
             router.push('/dashboard');
         } catch (err) {
             console.log('Login gagal:', err);
-            const msg = err?.response?.data?.message || 'Terjadi kesalahan';
+            const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Terjadi kesalahan';
             ToastAndroid.show(msg, ToastAndroid.SHORT);
         }
     };
